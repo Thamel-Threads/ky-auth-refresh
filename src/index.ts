@@ -48,12 +48,11 @@ export function createAuthRefreshHook(
 
     try {
       const retryRequest = onRetry ? await onRetry(request) : request;
-      return instance(retryRequest.url, {
+      return fetch(retryRequest.url, {
         method: retryRequest.method,
         headers: retryRequest.headers,
         body: retryRequest.body,
-        skipAuthRefresh: true,
-      } as KyAuthRefreshRequestConfig);
+      });
     } catch {
       return response;
     }
