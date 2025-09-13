@@ -54,7 +54,7 @@ export function createAuthRefreshHook(
         headers: retryRequest.headers,
         body: retryRequest.body,
       });
-      
+
       // Use Ky's internal fetch method to preserve all Ky functionality
       const kyInstance = instance as any;
       return kyInstance._options.fetch(newRequest, {});
