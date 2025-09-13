@@ -1,6 +1,6 @@
 {
   "name": "@thamel-threads/ky-auth-refresh",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Automatic authentication token refresh for Ky HTTP client",
   "type": "module",
   "main": "./dist/index.js",
