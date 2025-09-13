@@ -48,11 +48,16 @@ export function createAuthRefreshHook(
 
     try {
       const retryRequest = onRetry ? await onRetry(request) : request;
-      return fetch(retryRequest.url, {
+      // Create a new Request object and use Ky's internal fetch to avoid URL processing
+      const newRequest = new Request(retryRequest.url, {
         method: retryRequest.method,
         headers: retryRequest.headers,
         body: retryRequest.body,
       });
+      
+      // Use Ky's internal fetch method to preserve all Ky functionality
+      const kyInstance = instance as any;
+      return kyInstance._options.fetch(newRequest, {});
     } catch {
       return response;
     }
