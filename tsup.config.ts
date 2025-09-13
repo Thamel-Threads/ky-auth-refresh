@@ -6,15 +6,16 @@ export default defineConfig({
   dts: true,
   clean: true,
   splitting: false,
-  sourcemap: true,
+  sourcemap: false,
   minify: true,
   external: ['ky'],
   treeshake: true,
   target: 'es2022',
   outDir: 'dist',
   esbuildOptions(options) {
-    options.banner = {
-      js: '"use client";',
-    }
+    options.minifyIdentifiers = true;
+    options.minifySyntax = true;
+    options.minifyWhitespace = true;
+    options.drop = ['console', 'debugger'];
   },
 })

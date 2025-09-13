@@ -4,7 +4,7 @@ node_modules/
 .pnp.js
 
 # Production builds
-# dist/ - commented out so dist files are included in git for git-based installs
+# dist/
 build/
 *.tsbuildinfo
 
