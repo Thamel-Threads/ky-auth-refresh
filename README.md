@@ -42,11 +42,25 @@ createAuthRefreshHook(instance, refreshAuthCall, {
 
 ## Skip Refresh
 
+Use `skipAuthRefresh: true` to disable automatic token refresh for specific requests:
+
 ```typescript
-await client.get('public-endpoint', { 
+// Login requests should not trigger token refresh
+await client.post('auth/login', { 
+  json: credentials, 
   skipAuthRefresh: true 
 });
+
+// Public endpoints that don't require authentication
+await client.get('health-check', { skipAuthRefresh: true });
 ```
+
+### When to use `skipAuthRefresh`
+
+- **Authentication endpoints** (login, logout, refresh) - prevents infinite loops
+- **Public endpoints** - no authentication required
+- **Manual error handling** - when you want to handle auth errors yourself
+- **Testing** - to test specific error responses without triggering refresh
 
 ## License
 

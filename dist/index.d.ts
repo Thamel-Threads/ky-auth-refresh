@@ -1,12 +1,14 @@
-import { KyInstance, Options } from 'ky';
+import { KyInstance } from 'ky';
 
+declare module 'ky' {
+    interface Options {
+        skipAuthRefresh?: boolean;
+    }
+}
 interface KyAuthRefreshOptions {
     statusCodes?: number[];
     onRetry?: (request: Request) => Request | Promise<Request>;
 }
-interface KyAuthRefreshRequestConfig extends Options {
-    skipAuthRefresh?: boolean;
-}
 declare function createAuthRefreshHook(instance: KyInstance, refreshAuthCall: () => Promise<void>, options?: KyAuthRefreshOptions): KyInstance;
 
-export { type KyAuthRefreshOptions, type KyAuthRefreshRequestConfig, createAuthRefreshHook, createAuthRefreshHook as default };
+export { type KyAuthRefreshOptions, createAuthRefreshHook, createAuthRefreshHook as default };

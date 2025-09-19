@@ -1,13 +1,16 @@
 import { KyInstance, Options } from 'ky';
 
+declare module 'ky' {
+  interface Options {
+    skipAuthRefresh?: boolean;
+  }
+}
+
 export interface KyAuthRefreshOptions {
   statusCodes?: number[];
   onRetry?: (request: Request) => Request | Promise<Request>;
 }
 
-export interface KyAuthRefreshRequestConfig extends Options {
-  skipAuthRefresh?: boolean;
-}
 export function createAuthRefreshHook(
   instance: KyInstance,
   refreshAuthCall: () => Promise<void>,
@@ -23,39 +26,33 @@ export function createAuthRefreshHook(
 
   const afterResponseHook = async (
     request: Request,
-    requestOptions: any,
+    requestOptions: Options,
     response: Response
   ) => {
-    const opts = requestOptions as KyAuthRefreshRequestConfig;
     if (
-      opts?.skipAuthRefresh ||
+      requestOptions.skipAuthRefresh ||
       response.ok ||
       !statusCodes.includes(response.status)
     ) {
       return response;
     }
 
-    if (isRefreshing && refreshPromise) {
-      await refreshPromise;
-    } else if (!isRefreshing) {
+    if (!isRefreshing) {
       isRefreshing = true;
       refreshPromise = refreshAuthCall().finally(() => {
         isRefreshing = false;
         refreshPromise = null;
       });
-      await refreshPromise;
     }
 
-    try {
-      const retryRequest = onRetry ? await onRetry(request) : request;
-      // Create a new Request object and use Ky's internal fetch to avoid URL processing
-      const newRequest = new Request(retryRequest.url, {
-        method: retryRequest.method,
-        headers: retryRequest.headers,
-        body: retryRequest.body,
-      });
+    await refreshPromise;
 
-      // Use Ky's internal fetch method to preserve all Ky functionality
+    try {
+      let retryRequest = request;
+      if (onRetry) {
+        retryRequest = await onRetry(request);
+      }
+      const newRequest = new Request(retryRequest);
       const kyInstance = instance as any;
       return kyInstance._options.fetch(newRequest, {});
     } catch {
